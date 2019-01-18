@@ -74,6 +74,7 @@ public class BatteryMeterView extends LinearLayout implements
     private int mLevel;
     private boolean mForceShowPercent;
     private boolean mShowPercentAvailable;
+    private boolean mShowPercentInsideIconDefault;
 
     private int mDarkModeBackgroundColor;
     private int mDarkModeFillColor;
@@ -125,6 +126,8 @@ public class BatteryMeterView extends LinearLayout implements
         mSettingObserver = new SettingObserver(new Handler(context.getMainLooper()));
         mShowPercentAvailable = context.getResources().getBoolean(
                 com.android.internal.R.bool.config_battery_percentage_setting_available);
+        mShowPercentInsideIconDefault = context.getResources().getBoolean(
+                com.android.internal.R.bool.config_battery_percentage_show_inside_icon);
 
 
         addOnAttachStateChangeListener(
@@ -318,7 +321,7 @@ public class BatteryMeterView extends LinearLayout implements
                                 LayoutParams.WRAP_CONTENT,
                                 LayoutParams.MATCH_PARENT));
             }
-            if (showingInside && !showingText && !mForceShowPercent && !forcePercentageQsHeader()) {
+            if (showingInside || mShowPercentInsideIconDefault && !showingText && !mForceShowPercent && !forcePercentageQsHeader()) {
                 mDrawable.setShowPercent(true);
                 removeView(mBatteryPercentView);
                 mBatteryPercentView = null;
@@ -329,11 +332,12 @@ public class BatteryMeterView extends LinearLayout implements
                 mBatteryPercentView = null;
             }
         } else {
-            if (showingOutside || !showingInside) {
+            if (showingOutside || !showingInside && !mShowPercentInsideIconDefault) {
                 mDrawable.setShowPercent(false);
                 removeView(mBatteryPercentView);
                 mBatteryPercentView = null;
             }
+            mDrawable.setShowPercent(false);
         }
     }
 
@@ -346,6 +350,9 @@ public class BatteryMeterView extends LinearLayout implements
     public void onOverlayChanged() {
         mShowPercentAvailable = getContext().getResources().getBoolean(
                 com.android.internal.R.bool.config_battery_percentage_setting_available);
+        mShowPercentInsideIconDefault = getContext().getResources().getBoolean(
+                com.android.internal.R.bool.config_battery_percentage_show_inside_icon);
+        updateShowPercent();
     }
 
     /**

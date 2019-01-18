@@ -484,7 +484,7 @@ public class BatteryMeterDrawableBase extends Drawable {
         boolean pctOpaque = false;
         float pctX = 0, pctY = 0;
         String pctText = null;
-        if (!mCharging && !mPowerSaveEnabled && level > mCriticalLevel && mShowPercent) {
+        if (!mCharging && !mPowerSaveEnabled && level > mCriticalLevel && level < 100 && mShowPercent) {
             mTextPaint.setColor(getColorForLevel(level));
             final float full = 0.38f;
             final float nofull = 0.5f;

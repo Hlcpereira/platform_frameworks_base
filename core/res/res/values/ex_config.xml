@@ -160,6 +160,9 @@
     <integer name="nav_gesture_swipe_timout">250</integer>
     <!-- signification move threshold - if stays below will trigger action -->
     <integer name="nav_gesture_move_threshold">4</integer>
+
+    <!-- Whether to show battery percentage inside icon -->
+    <bool name="config_battery_percentage_show_inside_icon">false</bool>
 </resources>
 
 
