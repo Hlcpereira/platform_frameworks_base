@@ -43,6 +43,7 @@ public class BatteryMeterDrawableBase extends Drawable {
 
     private static final float ASPECT_RATIO = .58f;
     private static final float CIRCLE_ASPECT_RATIO = 1.0f;
+    private static final float ASPECT_RATIO_PERCENTAGE_INSIDE = .75f;
     public static final String TAG = BatteryMeterDrawableBase.class.getSimpleName();
     private static final float RADIUS_RATIO = 1.0f / 17f;
 
@@ -487,7 +488,11 @@ public class BatteryMeterDrawableBase extends Drawable {
         if (!mCharging && !mPowerSaveEnabled && level > mCriticalLevel && level < 100 && mShowPercent) {
             mTextPaint.setColor(getColorForLevel(level));
             final float full = 0.38f;
-            final float nofull = 0.5f;
+            if (showingInside && mShowPercentInsideIconDefault) {
+                final float nofull = 0.6f;
+            } else {
+                final float nofull = 0.5f;
+            }
             final float single = 0.75f;
             mTextPaint.setTextSize(height *
                     (SINGLE_DIGIT_PERCENT ? single
@@ -685,7 +690,7 @@ public class BatteryMeterDrawableBase extends Drawable {
         if (mMeterStyle != BATTERY_STYLE_PORTRAIT) {
             return CIRCLE_ASPECT_RATIO;
         }
-        return ASPECT_RATIO;
+        return mShowPercent && !mCharging ? ASPECT_RATIO_PERCENTAGE_INSIDE : ASPECT_RATIO;
     }
 
     protected float getRadiusRatio() {

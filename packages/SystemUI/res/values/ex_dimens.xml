@@ -41,4 +41,7 @@
 
     <!-- Membar spacing -->
     <dimen name="recents_membar_spacing">12dp</dimen>
+
+    <!-- Width of the battery icon (with percentage inside) in the status bar. -->
+    <dimen name="status_bar_battery_icon_width_percentage_inside">10.5dp</dimen>
 </resources>
