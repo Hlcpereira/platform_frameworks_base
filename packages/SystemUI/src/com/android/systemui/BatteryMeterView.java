@@ -250,6 +250,10 @@ public class BatteryMeterView extends LinearLayout implements
         }
         mDrawable.setBatteryLevel(level);
         mDrawable.setCharging(pluggedIn);
+        if (mLevel != level){
+            mLevel = level;
+            updateShowPercent();
+        }
         mLevel = level;
         updatePercentText();
         setContentDescription(
@@ -325,6 +329,7 @@ public class BatteryMeterView extends LinearLayout implements
                 mDrawable.setShowPercent(true);
                 removeView(mBatteryPercentView);
                 mBatteryPercentView = null;
+                scaleBatteryMeterViews(mLevel != 100);
             }
             if (hideText && !showingText && !mForceShowPercent && !forcePercentageQsHeader()) {
                 mDrawable.setShowPercent(false);
