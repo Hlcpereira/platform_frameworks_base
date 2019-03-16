@@ -694,6 +694,8 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
     private boolean mNoAnimationOnNextBarModeChange;
     protected FalsingManager mFalsingManager;
 
+    private boolean mDisplayCutoutHidden;
+
     private final KeyguardUpdateMonitorCallback mUpdateCallback =
             new KeyguardUpdateMonitorCallback() {
                 @Override
@@ -2387,6 +2389,21 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                 Settings.Secure.SYSUI_ROUNDED_CONTENT_PADDING, contentPaddingRes);
 
         return (cornerRadiusRes == cornerRadius) && (contentPaddingRes == contentPadding);
+    }
+
+    private void updateCutoutOverlay() {
+        boolean displayCutoutHidden = Settings.System.getIntForUser(mContext.getContentResolver(),
+                        Settings.System.DISPLAY_CUTOUT_HIDDEN, 0, UserHandle.USER_CURRENT) == 1;
+        if (mDisplayCutoutHidden != displayCutoutHidden){
+            mDisplayCutoutHidden = displayCutoutHidden;
+            mUiOffloadThread.submit(() -> {
+                try {
+                    mOverlayManager.setEnabled("org.pixelexperience.overlay.hidecutout",
+                                mDisplayCutoutHidden, mLockscreenUserManager.getCurrentUserId());
+                } catch (RemoteException ignored) {
+                }
+            });
+        }
     }
 
     @Nullable
@@ -5720,7 +5737,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                     Settings.System.DOUBLE_TAP_SLEEP_GESTURE),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.HEADS_UP_STOPLIST_VALUES), 
+                    Settings.System.HEADS_UP_STOPLIST_VALUES),
                     false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HEADS_UP_BLACKLIST_VALUES),
@@ -5757,6 +5774,9 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LOCKSCREEN_CLOCK_SELECTION),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.DISPLAY_CUTOUT_HIDDEN),
                     false, this, UserHandle.USER_ALL);
         }
 
@@ -5806,6 +5826,8 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
                    uri.equals(Settings.System.getUriFor(Settings.System.LOCKSCREEN_INFO)) ||
                    uri.equals(Settings.System.getUriFor(Settings.System.LOCKSCREEN_CLOCK_SELECTION))) {
                 updateKeyguardStatusSettings();
+            }else if (uri.equals(Settings.System.getUriFor(Settings.System.DISPLAY_CUTOUT_HIDDEN))) {
+                updateCutoutOverlay();
             }
 
         }
@@ -5821,6 +5843,7 @@ public class StatusBar extends SystemUI implements DemoMode, TunerService.Tunabl
             setForceAmbient();
             updateCorners();
             updateKeyguardStatusSettings();
+            updateCutoutOverlay();
         }
     }
 
